@@ -5,9 +5,9 @@ using UnityEngine.InputSystem;
 
 namespace InputGlyphs.Display
 {
-    public class InputMessagePropagator : MonoBehaviour, IDisplayManager
+    public class InputGlyphDisplayManager : MonoBehaviour, IGlyphDisplayManager
     {
-        public static IDisplayManager Manager { get; private set; }
+        public static IGlyphDisplayManager Instance { get; private set; }
 
         [SerializeField]
         private PlayerInput PlayerInput;
@@ -24,7 +24,7 @@ namespace InputGlyphs.Display
 
         private void Awake()
         {
-            Manager = this;
+            Instance = this;
         }
 
         public void Register(IGlyphDisplay display)

@@ -48,13 +48,13 @@ namespace InputGlyphs.Display
         protected override void OnEnable()
         {
             base.OnEnable();
-            InputMessagePropagator.Manager.Register(this);
+            InputGlyphDisplayManager.Instance.Register(this);
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            InputMessagePropagator.Manager.Unregister(this);
+            InputGlyphDisplayManager.Instance.Unregister(this);
         }
 
         protected override void OnDestroy()
