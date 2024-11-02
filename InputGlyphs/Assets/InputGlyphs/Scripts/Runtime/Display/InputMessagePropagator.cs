@@ -79,7 +79,10 @@ namespace InputGlyphs.Display
         {
             foreach (var glyphDisplay in glyphDisplays)
             {
-                glyphDisplay.UpdateGlyphs(playerInput);
+                if (glyphDisplay.IsVisible)
+                {
+                    glyphDisplay.UpdateGlyphs(playerInput);
+                }
             }
         }
 
