@@ -1,7 +1,6 @@
 #if INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
-using System.Collections.Generic;
-using System.Linq;
 using InputGlyphs.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -9,13 +8,12 @@ using UnityEngine.UI;
 
 namespace InputGlyphs.Display
 {
-    public class InputGlyphImage : UIBehaviour, ILayoutElement
+    public class InputGlyphImage : UIBehaviour, ILayoutElement, IGlyphDisplay
     {
-        [SerializeField]
-        public Image Image = null;
+        public bool IsVisible => Image != null && Image.isActiveAndEnabled && Image.rectTransform.IsBecomeVisible();
 
         [SerializeField]
-        public PlayerInput PlayerInput = null;
+        public Image Image = null;
 
         [SerializeField]
         public InputActionReference InputActionReference = null;
@@ -33,7 +31,6 @@ namespace InputGlyphs.Display
         {
             base.Reset();
             Image = GetComponent<Image>();
-            PlayerInput = FindAnyObjectByType<PlayerInput>();
         }
 #endif
 
@@ -48,27 +45,16 @@ namespace InputGlyphs.Display
             _texture = new Texture2D(2, 2);
         }
 
-        protected override void Start()
+        protected override void OnEnable()
         {
-            base.Start();
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
-            {
-                PlayerInput = PlayerInput.all.FirstOrDefault();
-            }
-            if (PlayerInput == null)
-            {
-                Debug.LogWarning("PlayerInput is not set.", this);
-            }
+            base.OnEnable();
+            InputMessagePropagator.Manager.Register(this);
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            if (_lastPlayerInput != null)
-            {
-                UnregisterPlayerInputEvents(_lastPlayerInput);
-                _lastPlayerInput = null;
-            }
+            InputMessagePropagator.Manager.Unregister(this);
         }
 
         protected override void OnDestroy()
@@ -78,72 +64,11 @@ namespace InputGlyphs.Display
             _texture = null;
             if (Image != null)
             {
-                Destroy(Image.sprite);
                 Image.sprite = null;
             }
         }
 
-        protected virtual void Update()
-        {
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
-            {
-                PlayerInput = PlayerInput.all.FirstOrDefault();
-            }
-
-            if (PlayerInput != _lastPlayerInput)
-            {
-                if (_lastPlayerInput != null)
-                {
-                    UnregisterPlayerInputEvents(_lastPlayerInput);
-                }
-                if (PlayerInput == null)
-                {
-                    Debug.LogError("PlayerInput is not set.", this);
-                }
-                else
-                {
-                    RegisterPlayerInputEvents(PlayerInput);
-                    UpdateGlyphs(PlayerInput);
-                }
-                _lastPlayerInput = PlayerInput;
-            }
-        }
-
-        private void RegisterPlayerInputEvents(PlayerInput playerInput)
-        {
-            switch (playerInput.notificationBehavior)
-            {
-                case PlayerNotifications.InvokeUnityEvents:
-                    playerInput.controlsChangedEvent.AddListener(OnControlsChanged);
-                    break;
-                case PlayerNotifications.InvokeCSharpEvents:
-                    playerInput.onControlsChanged += OnControlsChanged;
-                    break;
-            }
-        }
-
-        private void UnregisterPlayerInputEvents(PlayerInput playerInput)
-        {
-            switch (playerInput.notificationBehavior)
-            {
-                case PlayerNotifications.InvokeUnityEvents:
-                    playerInput.controlsChangedEvent.RemoveListener(OnControlsChanged);
-                    break;
-                case PlayerNotifications.InvokeCSharpEvents:
-                    playerInput.onControlsChanged -= OnControlsChanged;
-                    break;
-            }
-        }
-
-        private void OnControlsChanged(PlayerInput playerInput)
-        {
-            if (playerInput == PlayerInput)
-            {
-                UpdateGlyphs(playerInput);
-            }
-        }
-
-        private void UpdateGlyphs(PlayerInput playerInput)
+        public void UpdateGlyphs(PlayerInput playerInput)
         {
             if (!playerInput.isActiveAndEnabled)
             {
@@ -157,11 +82,10 @@ namespace InputGlyphs.Display
                 return;
             }
 
-            if (InputLayoutPathUtility.TryGetActionBindingPath(InputActionReference?.action, PlayerInput.currentControlScheme, _pathBuffer))
+            if (InputLayoutPathUtility.TryGetActionBindingPath(InputActionReference?.action, playerInput.currentControlScheme, _pathBuffer))
             {
                 if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, devices, _pathBuffer, GlyphsLayoutData))
                 {
-                    Destroy(Image.sprite);
                     Image.sprite = Sprite.Create(_texture, new Rect(0, 0, _texture.width, _texture.height), new Vector2(0.5f, 0.5f), Mathf.Min(_texture.width, _texture.height));
                 }
             }

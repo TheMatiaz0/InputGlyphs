@@ -1,6 +1,5 @@
 #if INPUT_SYSTEM && ENABLE_INPUT_SYSTEM && SUPPORT_TMPRO
 using System.Text;
-using InputGlyphs.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -40,21 +39,6 @@ namespace InputGlyphs.Display.Editor
                         }
                     }
                 }
-            }
-
-            var playerInputError = false;
-            foreach (var t in targets)
-            {
-                var glyphImage = (InputGlyphText)t;
-                if (glyphImage.PlayerInput != null && !InputGlyphEditorUtility.ValidatePlayerInputNotificationBehavior(glyphImage.PlayerInput))
-                {
-                    playerInputError = true;
-                    break;
-                }
-            }
-            if (playerInputError)
-            {
-                EditorGUILayout.HelpBox(InputGlyphEditorUtility.GetPlayerInputNotificationBehaviorErrorMessage(), MessageType.Error);
             }
         }
     }

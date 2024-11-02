@@ -1,9 +1,9 @@
 #if INPUT_SYSTEM && ENABLE_INPUT_SYSTEM && SUPPORT_TMPRO
+using InputGlyphs.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using InputGlyphs.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,18 +12,17 @@ using UnityEngine.TextCore;
 
 namespace InputGlyphs.Display
 {
-    public class InputGlyphText : MonoBehaviour
+    public class InputGlyphText : MonoBehaviour, IGlyphDisplay
     {
         public static int PackedTextureSize = 2048;
+
+        public bool IsVisible => Text != null && Text.isActiveAndEnabled && Text.rectTransform.IsBecomeVisible();
 
         [SerializeField]
         public TMP_Text Text = null;
 
         [SerializeField, HideInInspector]
         public Material Material = null;
-
-        [SerializeField]
-        public PlayerInput PlayerInput = null;
 
         [SerializeField]
         public InputActionReference[] InputActionReferences = null;
@@ -43,7 +42,6 @@ namespace InputGlyphs.Display
         private void Reset()
         {
             Text = GetComponent<TMP_Text>();
-            PlayerInput = FindAnyObjectByType<PlayerInput>();
         }
 
         private void Awake()
@@ -61,27 +59,6 @@ namespace InputGlyphs.Display
             Text.spriteAsset = _sharedSpriteAsset;
         }
 
-        private void Start()
-        {
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
-            {
-                PlayerInput = PlayerInput.all.FirstOrDefault();
-            }
-            if (PlayerInput == null)
-            {
-                Debug.LogWarning("PlayerInput is not set.", this);
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (_lastPlayerInput != null)
-            {
-                UnregisterPlayerInputEvents(_lastPlayerInput);
-                _lastPlayerInput = null;
-            }
-        }
-
         private void OnDestroy()
         {
             for (var i = 0; i < _actionTextureBuffer.Count; i++)
@@ -97,67 +74,7 @@ namespace InputGlyphs.Display
             _sharedSpriteAsset = null;
         }
 
-        private void Update()
-        {
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
-            {
-                PlayerInput = PlayerInput.all.FirstOrDefault();
-            }
-
-            if (PlayerInput != _lastPlayerInput)
-            {
-                if (_lastPlayerInput != null)
-                {
-                    UnregisterPlayerInputEvents(_lastPlayerInput);
-                }
-                if (PlayerInput == null)
-                {
-                    Debug.LogError("PlayerInput is not set.", this);
-                }
-                else
-                {
-                    RegisterPlayerInputEvents(PlayerInput);
-                    UpdateGlyphs(PlayerInput);
-                }
-                _lastPlayerInput = PlayerInput;
-            }
-        }
-
-        private void RegisterPlayerInputEvents(PlayerInput playerInput)
-        {
-            switch (playerInput.notificationBehavior)
-            {
-                case PlayerNotifications.InvokeUnityEvents:
-                    playerInput.controlsChangedEvent.AddListener(OnControlsChanged);
-                    break;
-                case PlayerNotifications.InvokeCSharpEvents:
-                    playerInput.onControlsChanged += OnControlsChanged;
-                    break;
-            }
-        }
-
-        private void UnregisterPlayerInputEvents(PlayerInput playerInput)
-        {
-            switch (playerInput.notificationBehavior)
-            {
-                case PlayerNotifications.InvokeUnityEvents:
-                    playerInput.controlsChangedEvent.RemoveListener(OnControlsChanged);
-                    break;
-                case PlayerNotifications.InvokeCSharpEvents:
-                    playerInput.onControlsChanged -= OnControlsChanged;
-                    break;
-            }
-        }
-
-        private void OnControlsChanged(PlayerInput playerInput)
-        {
-            if (playerInput == PlayerInput)
-            {
-                UpdateGlyphs(playerInput);
-            }
-        }
-
-        private void UpdateGlyphs(PlayerInput playerInput)
+        public void UpdateGlyphs(PlayerInput playerInput)
         {
             Profiler.BeginSample("UpdateGlyphs");
 
@@ -177,7 +94,7 @@ namespace InputGlyphs.Display
             for (var i = 0; i < InputActionReferences.Length; i++)
             {
                 var actionReference = InputActionReferences[i];
-                if (InputLayoutPathUtility.TryGetActionBindingPath(actionReference?.action, PlayerInput.currentControlScheme, _pathBuffer))
+                if (InputLayoutPathUtility.TryGetActionBindingPath(actionReference?.action, playerInput.currentControlScheme, _pathBuffer))
                 {
                     Texture2D texture;
                     if (i < _actionTextureBuffer.Count)
