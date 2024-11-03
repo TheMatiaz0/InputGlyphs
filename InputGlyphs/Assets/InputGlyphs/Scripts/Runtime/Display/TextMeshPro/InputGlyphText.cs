@@ -16,6 +16,7 @@ namespace InputGlyphs.Display
     public class InputGlyphText : MonoBehaviour, IGlyphDisplay
     {
         public static int PackedTextureSize = 2048;
+        private static readonly int MainTex = Shader.PropertyToID("_MainTex");
 
         public bool IsVisible => Text != null && Text.isActiveAndEnabled;
 
@@ -53,7 +54,7 @@ namespace InputGlyphs.Display
             }
             _packedTexture = new Texture2D(2, 2);
             _sharedMaterial = new Material(Material);
-            _sharedMaterial.SetTexture("_MainTex", _packedTexture);
+            _sharedMaterial.SetTexture(MainTex, _packedTexture);
             _sharedSpriteAsset = CreateEmptySpriteAsset();
             _sharedSpriteAsset.material = _sharedMaterial;
             _sharedSpriteAsset.spriteSheet = _packedTexture;

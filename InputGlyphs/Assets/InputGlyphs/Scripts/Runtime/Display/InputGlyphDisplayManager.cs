@@ -40,7 +40,7 @@ namespace InputGlyphs.Display
             {
                 if (PlayerInput.notificationBehavior is PlayerNotifications.SendMessages or PlayerNotifications.BroadcastMessages)
                 {
-                    if (!PlayerInput.TryGetComponent<ControlsChangedMessageBroker>(out _messageBroker))
+                    if (!PlayerInput.TryGetComponent(out _messageBroker))
                     {
                         _messageBroker = PlayerInput.gameObject.AddComponent<ControlsChangedMessageBroker>();
                     }
