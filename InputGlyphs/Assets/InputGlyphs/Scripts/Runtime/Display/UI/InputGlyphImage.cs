@@ -10,7 +10,7 @@ namespace InputGlyphs.Display
 {
     public class InputGlyphImage : UIBehaviour, ILayoutElement, IGlyphDisplay
     {
-        public bool IsVisible => Image != null && Image.isActiveAndEnabled && Image.rectTransform.IsBecomeVisible();
+        public bool IsVisible => Image != null && Image.isActiveAndEnabled;
 
         [SerializeField]
         public Image Image = null;
@@ -48,13 +48,13 @@ namespace InputGlyphs.Display
         protected override void OnEnable()
         {
             base.OnEnable();
-            InputGlyphDisplayManager.Instance.Register(this);
+            InputGlyphDisplayBridge.Register(this);
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            InputGlyphDisplayManager.Instance.Unregister(this);
+            InputGlyphDisplayBridge.Unregister(this);
         }
 
         protected override void OnDestroy()
@@ -82,7 +82,9 @@ namespace InputGlyphs.Display
                 return;
             }
 
-            if (InputLayoutPathUtility.TryGetActionBindingPath(InputActionReference?.action, playerInput.currentControlScheme, _pathBuffer))
+            var controlScheme = playerInput.currentControlScheme;
+
+            if (InputLayoutPathUtility.TryGetActionBindingPath(InputActionReference?.action, controlScheme, _pathBuffer))
             {
                 if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, devices, _pathBuffer, GlyphsLayoutData))
                 {

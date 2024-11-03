@@ -47,6 +47,16 @@ namespace InputGlyphs.Display
             }
         }
 
+        private void OnEnable()
+        {
+            InputGlyphDisplayBridge.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            InputGlyphDisplayBridge.Unregister(this);
+        }
+
         public void UpdateGlyphs(PlayerInput playerInput)
         {
             if (!playerInput.isActiveAndEnabled)
@@ -61,7 +71,9 @@ namespace InputGlyphs.Display
                 return;
             }
 
-            if (InputLayoutPathUtility.TryGetActionBindingPath(InputActionReference?.action, playerInput.currentControlScheme, _pathBuffer))
+            var controlScheme = playerInput.currentControlScheme;
+
+            if (InputLayoutPathUtility.TryGetActionBindingPath(InputActionReference?.action, controlScheme, _pathBuffer))
             {
                 if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, devices, _pathBuffer, GlyphsLayoutData))
                 {

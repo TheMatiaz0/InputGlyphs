@@ -16,7 +16,7 @@ namespace InputGlyphs.Display
     {
         public static int PackedTextureSize = 2048;
 
-        public bool IsVisible => Text != null && Text.isActiveAndEnabled && Text.rectTransform.IsBecomeVisible();
+        public bool IsVisible => Text != null && Text.isActiveAndEnabled;
 
         [SerializeField]
         public TMP_Text Text = null;
@@ -74,6 +74,16 @@ namespace InputGlyphs.Display
             _sharedSpriteAsset = null;
         }
 
+        private void OnEnable()
+        {
+            InputGlyphDisplayBridge.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            InputGlyphDisplayBridge.Unregister(this);
+        }
+
         public void UpdateGlyphs(PlayerInput playerInput)
         {
             Profiler.BeginSample("UpdateGlyphs");
@@ -108,7 +118,7 @@ namespace InputGlyphs.Display
                     }
                     if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(texture, devices, _pathBuffer, GlyphsLayoutData))
                     {
-                        _actionTextureIndexes.Add(Tuple.Create(actionReference.action.name, i));
+                        _actionTextureIndexes.Add(Tuple.Create(actionReference?.action.name, i));
                     }
                 }
             }

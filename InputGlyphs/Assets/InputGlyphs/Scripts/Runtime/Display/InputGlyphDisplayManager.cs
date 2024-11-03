@@ -1,19 +1,15 @@
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace InputGlyphs.Display
 {
-    public class InputGlyphDisplayManager : MonoBehaviour, IGlyphDisplayManager
+    public class InputGlyphDisplayManager : MonoBehaviour
     {
-        public static IGlyphDisplayManager Instance { get; private set; }
-
         [SerializeField]
         private PlayerInput PlayerInput;
 
         private PlayerInput _lastPlayerInput;
-        private List<IGlyphDisplay> glyphDisplays = new List<IGlyphDisplay>();
 
 #if UNITY_EDITOR
         private void Reset()
@@ -21,22 +17,7 @@ namespace InputGlyphs.Display
             PlayerInput = FindAnyObjectByType<PlayerInput>();
         }
 #endif
-
-        private void Awake()
-        {
-            Instance = this;
-        }
-
-        public void Register(IGlyphDisplay display)
-        {
-            glyphDisplays.Add(display);
-        }
-
-        public void Unregister(IGlyphDisplay display)
-        {
-            glyphDisplays.Remove(display);
-        }
-
+        
         private void Start()
         {
             if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
@@ -56,34 +37,21 @@ namespace InputGlyphs.Display
                 PlayerInput = PlayerInput.all.FirstOrDefault();
             }
 
-            if (PlayerInput != _lastPlayerInput)
+            if (PlayerInput == _lastPlayerInput) return;
+            if (_lastPlayerInput != null)
             {
-                if (_lastPlayerInput != null)
-                {
-                    UnregisterPlayerInputEvents(_lastPlayerInput);
-                }
-                if (PlayerInput == null)
-                {
-                    Debug.LogError("PlayerInput is not set.", this);
-                }
-                else
-                {
-                    RegisterPlayerInputEvents(PlayerInput);
-                    UpdateGlyphs(PlayerInput);
-                }
-                _lastPlayerInput = PlayerInput;
+                UnregisterPlayerInputEvents(_lastPlayerInput);
             }
-        }
-
-        private void UpdateGlyphs(PlayerInput playerInput)
-        {
-            foreach (var glyphDisplay in glyphDisplays)
+            if (PlayerInput == null)
             {
-                if (glyphDisplay.IsVisible)
-                {
-                    glyphDisplay.UpdateGlyphs(playerInput);
-                }
+                Debug.LogError("PlayerInput is not set.", this);
             }
+            else
+            {
+                RegisterPlayerInputEvents(PlayerInput);
+                InputGlyphDisplayBridge.UpdateGlyphs(PlayerInput);
+            }
+            _lastPlayerInput = PlayerInput;
         }
 
         private void RegisterPlayerInputEvents(PlayerInput playerInput)
@@ -125,7 +93,7 @@ namespace InputGlyphs.Display
         {
             if (playerInput == PlayerInput)
             {
-                UpdateGlyphs(playerInput);
+                InputGlyphDisplayBridge.UpdateGlyphs(playerInput);
             }
         }
 
