@@ -2,7 +2,6 @@
 using InputGlyphs.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using TMPro;
 using UnityEngine;
@@ -15,7 +14,6 @@ namespace InputGlyphs.Display
 {
     public class InputGlyphText : MonoBehaviour, IGlyphDisplay
     {
-        public static int PackedTextureSize = 2048;
         private static readonly int MainTex = Shader.PropertyToID("_MainTex");
 
         public bool IsVisible => Text != null && Text.isActiveAndEnabled;

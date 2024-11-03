@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1231640719192884950}
   - component: {fileID: 3076628620579122891}
   - component: {fileID: 1037795724000419062}
+  - component: {fileID: 4596316060635445754}
   m_Layer: 0
   m_Name: InputGlyphsSetup_Steamworks
   m_TagString: Untagged
@@ -91,3 +92,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerInput: {fileID: 0}
+--- !u!114 &4596316060635445754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3650075401769085156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e43e5d8c34dc46a5b2fd08a6f73cbab3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InputManager: {fileID: 1037795724000419062}

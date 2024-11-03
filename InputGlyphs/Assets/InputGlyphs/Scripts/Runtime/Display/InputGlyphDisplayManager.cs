@@ -1,5 +1,3 @@
-using System.Linq;
-using InputGlyphs.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,114 +5,31 @@ namespace InputGlyphs.Display
 {
     public class InputGlyphDisplayManager : MonoBehaviour
     {
-        [SerializeField]
-        private PlayerInput PlayerInput;
+        [SerializeField] private InputManager InputManager;
 
-        private PlayerInput _lastPlayerInput;
-        private ControlsChangedMessageBroker _messageBroker;
-
-#if UNITY_EDITOR
-        private void Reset()
+        private void Awake()
         {
-            PlayerInput = FindAnyObjectByType<PlayerInput>();
-        }
-#endif
-        
-        private void Start()
-        {
-            TryGetPlayerInput();
-        }
-
-        private void TryGetPlayerInput()
-        {
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
+            if (InputManager == null)
             {
-                PlayerInput = PlayerInput.all.FirstOrDefault();
+                return;
             }
             
-            if (PlayerInput == null)
-            {
-                Debug.LogError("PlayerInput is not set.", this);
-            }
-            else
-            {
-                if (PlayerInput.notificationBehavior is PlayerNotifications.SendMessages or PlayerNotifications.BroadcastMessages)
-                {
-                    if (!PlayerInput.TryGetComponent(out _messageBroker))
-                    {
-                        _messageBroker = PlayerInput.gameObject.AddComponent<ControlsChangedMessageBroker>();
-                    }
-                }
-            }
-        }
-
-        private void Update()
-        {
-            TryGetPlayerInput();
-
-            if (PlayerInput == _lastPlayerInput) return;
-            if (_lastPlayerInput != null)
-            {
-                UnregisterPlayerInputEvents(_lastPlayerInput);
-            }
-
-            else
-            {
-                RegisterPlayerInputEvents(PlayerInput);
-                InputGlyphDisplayBridge.UpdateGlyphs(PlayerInput);
-            }
-            _lastPlayerInput = PlayerInput;
-        }
-
-        private void RegisterPlayerInputEvents(PlayerInput playerInput)
-        {
-            switch (playerInput.notificationBehavior)
-            {
-                case PlayerNotifications.InvokeUnityEvents:
-                    playerInput.controlsChangedEvent.AddListener(OnControlsChanged);
-                    break;
-                case PlayerNotifications.InvokeCSharpEvents:
-                    playerInput.onControlsChanged += OnControlsChanged;
-                    break;
-                case PlayerNotifications.SendMessages:
-                case PlayerNotifications.BroadcastMessages:
-                    _messageBroker.OnControlsChangedMessage += OnControlsChanged;
-                    break;
-            }
-        }
-
-        private void UnregisterPlayerInputEvents(PlayerInput playerInput)
-        {
-            switch (playerInput.notificationBehavior)
-            {
-                case PlayerNotifications.InvokeUnityEvents:
-                    playerInput.controlsChangedEvent.RemoveListener(OnControlsChanged);
-                    break;
-                case PlayerNotifications.InvokeCSharpEvents:
-                    playerInput.onControlsChanged -= OnControlsChanged;
-                    break;
-                case PlayerNotifications.SendMessages:
-                case PlayerNotifications.BroadcastMessages:
-                    _messageBroker.OnControlsChangedMessage -= OnControlsChanged;
-                    break;
-            }
+            InputManager.OnControlsChangedEvent += OnControlsChanged;
         }
 
         private void OnDestroy()
         {
-            if (_lastPlayerInput != null)
+            if (InputManager == null)
             {
-                UnregisterPlayerInputEvents(_lastPlayerInput);
-                _lastPlayerInput = null;
+                return;
             }
+            
+            InputManager.OnControlsChangedEvent -= OnControlsChanged;
         }
 
         private void OnControlsChanged(PlayerInput playerInput)
         {
-            if (playerInput == PlayerInput)
-            {
-                InputGlyphDisplayBridge.UpdateGlyphs(playerInput);
-            }
+            InputGlyphDisplayBridge.UpdateGlyphs(playerInput);
         }
     }
 }

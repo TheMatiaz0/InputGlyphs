@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2827406321184447389}
   - component: {fileID: 7385500171108915817}
   - component: {fileID: 9106323170085613964}
+  - component: {fileID: 2148885782478146683}
   m_Layer: 0
   m_Name: InputGlyphsSetup
   m_TagString: Untagged
@@ -95,3 +96,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerInput: {fileID: 0}
+--- !u!114 &2148885782478146683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8434621703953164786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e43e5d8c34dc46a5b2fd08a6f73cbab3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InputManager: {fileID: 9106323170085613964}

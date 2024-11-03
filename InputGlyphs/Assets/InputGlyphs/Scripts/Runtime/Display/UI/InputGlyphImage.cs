@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace InputGlyphs.Display
 {
-    public class InputGlyphImage : UIBehaviour, ILayoutElement, IGlyphDisplay
+    public sealed class InputGlyphImage : UIBehaviour, ILayoutElement, IGlyphDisplay
     {
         public bool IsVisible => Image != null && Image.isActiveAndEnabled;
 
@@ -21,8 +21,7 @@ namespace InputGlyphs.Display
 
         [SerializeField]
         public GlyphsLayoutData GlyphsLayoutData = GlyphsLayoutData.Default;
-
-        private Vector2 _defaultSizeDelta;
+        
         private PlayerInput _lastPlayerInput;
         private List<string> _pathBuffer = new List<string>();
         private Texture2D _texture;
@@ -42,7 +41,6 @@ namespace InputGlyphs.Display
             {
                 Image = GetComponent<Image>();
             }
-            _defaultSizeDelta = Image.rectTransform.sizeDelta;
             _texture = new Texture2D(2, 2);
         }
 
@@ -93,17 +91,17 @@ namespace InputGlyphs.Display
         [SerializeField]
         public float LayoutElementSize = 100f;
 
-        public virtual int layoutPriority => EnableLayoutElement ? LayoutElementPriority : -1;
+        public int layoutPriority => EnableLayoutElement ? LayoutElementPriority : -1;
 
-        public virtual void CalculateLayoutInputHorizontal() { }
+        public void CalculateLayoutInputHorizontal() { }
 
-        public virtual void CalculateLayoutInputVertical() { }
+        public void CalculateLayoutInputVertical() { }
 
-        public virtual float minWidth => -1;
+        public float minWidth => -1;
 
-        public virtual float minHeight => -1;
+        public float minHeight => -1;
 
-        public virtual float preferredWidth
+        public float preferredWidth
         {
             get
             {
@@ -117,13 +115,13 @@ namespace InputGlyphs.Display
             }
         }
 
-        public virtual float preferredHeight => LayoutElementSize;
+        public float preferredHeight => LayoutElementSize;
 
-        public virtual float flexibleWidth => -1;
+        public float flexibleWidth => -1;
 
-        public virtual float flexibleHeight => -1;
+        public float flexibleHeight => -1;
 
-        protected void SetDirty()
+        private void SetDirty()
         {
             if (!IsActive())
                 return;
