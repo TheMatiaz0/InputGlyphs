@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.InputSystem;
 
 namespace InputGlyphs.Display
@@ -19,11 +20,16 @@ namespace InputGlyphs.Display
         
         public static void UpdateGlyphs(PlayerInput playerInput)
         {
+            if (playerInput == null || !playerInput.isActiveAndEnabled || playerInput.devices.Count == 0)
+            {
+                return;
+            }
+            
             foreach (var glyphDisplay in GlyphDisplays)
             {
                 if (glyphDisplay.IsVisible)
-                { 
-                    glyphDisplay.UpdateGlyphs(playerInput);
+                {
+                    glyphDisplay.UpdateGlyphs(playerInput.devices, playerInput.currentControlScheme);
                 }
             }
         }

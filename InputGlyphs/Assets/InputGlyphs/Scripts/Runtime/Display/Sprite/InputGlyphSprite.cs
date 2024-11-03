@@ -3,6 +3,7 @@ using InputGlyphs.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 
 namespace InputGlyphs.Display
 {
@@ -57,22 +58,8 @@ namespace InputGlyphs.Display
             InputGlyphDisplayBridge.Unregister(this);
         }
 
-        public void UpdateGlyphs(PlayerInput playerInput)
+        public void UpdateGlyphs(ReadOnlyArray<InputDevice> devices, string controlScheme)
         {
-            if (!playerInput.isActiveAndEnabled)
-            {
-                return;
-            }
-
-            var devices = playerInput.devices;
-            if (devices.Count == 0)
-            {
-                Debug.LogWarning("No devices are connected.", this);
-                return;
-            }
-
-            var controlScheme = playerInput.currentControlScheme;
-
             if (InputLayoutPathUtility.TryGetActionBindingPath(InputActionReference?.action, controlScheme, _pathBuffer))
             {
                 if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, devices, _pathBuffer, GlyphsLayoutData))

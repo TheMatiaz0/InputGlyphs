@@ -7,6 +7,7 @@ using System.Reflection;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 using UnityEngine.Profiling;
 using UnityEngine.TextCore;
 
@@ -84,27 +85,15 @@ namespace InputGlyphs.Display
             InputGlyphDisplayBridge.Unregister(this);
         }
 
-        public void UpdateGlyphs(PlayerInput playerInput)
+        public void UpdateGlyphs(ReadOnlyArray<InputDevice> devices, string controlScheme)
         {
             Profiler.BeginSample("UpdateGlyphs");
-
-            if (!playerInput.isActiveAndEnabled)
-            {
-                return;
-            }
-
-            var devices = playerInput.devices;
-            if (devices.Count == 0)
-            {
-                Debug.LogWarning("No devices are connected.", this);
-                return;
-            }
-
+            
             _actionTextureIndexes.Clear();
             for (var i = 0; i < InputActionReferences.Length; i++)
             {
                 var actionReference = InputActionReferences[i];
-                if (InputLayoutPathUtility.TryGetActionBindingPath(actionReference?.action, playerInput.currentControlScheme, _pathBuffer))
+                if (InputLayoutPathUtility.TryGetActionBindingPath(actionReference?.action, controlScheme, _pathBuffer))
                 {
                     Texture2D texture;
                     if (i < _actionTextureBuffer.Count)
