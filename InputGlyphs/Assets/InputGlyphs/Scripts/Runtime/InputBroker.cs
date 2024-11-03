@@ -9,6 +9,7 @@ namespace InputGlyphs
     {
         public event Action<PlayerInput> OnControlsChangedEvent;
         
+        [Header("Optional: InputBroker will try to find PlayerInput")]
         [SerializeField]
         private PlayerInput PlayerInput;
 
