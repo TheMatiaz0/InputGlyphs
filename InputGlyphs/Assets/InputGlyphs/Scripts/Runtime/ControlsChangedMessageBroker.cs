@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace InputGlyphs.Utils
+namespace InputGlyphs
 {
     [RequireComponent(typeof(PlayerInput))]
     public class ControlsChangedMessageBroker : MonoBehaviour

@@ -1,13 +1,11 @@
 using System;
 using System.Linq;
-using InputGlyphs.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using InputGlyphs.Display;
 
 namespace InputGlyphs
 {
-    public class InputManager : MonoBehaviour
+    public class InputBroker : MonoBehaviour
     {
         public event Action<PlayerInput> OnControlsChangedEvent;
         

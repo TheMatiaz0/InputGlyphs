@@ -1,4 +1,4 @@
-namespace InputGlyphs.Display
+namespace InputGlyphs
 {
     public static class InputGlyphDisplaySettings
     {

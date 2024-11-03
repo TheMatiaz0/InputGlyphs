@@ -5,26 +5,26 @@ namespace InputGlyphs.Display
 {
     public class InputGlyphDisplayManager : MonoBehaviour
     {
-        [SerializeField] private InputManager InputManager;
+        [SerializeField] private InputBroker InputBroker;
 
         private void Awake()
         {
-            if (InputManager == null)
+            if (InputBroker == null)
             {
                 return;
             }
             
-            InputManager.OnControlsChangedEvent += OnControlsChanged;
+            InputBroker.OnControlsChangedEvent += OnControlsChanged;
         }
 
         private void OnDestroy()
         {
-            if (InputManager == null)
+            if (InputBroker == null)
             {
                 return;
             }
             
-            InputManager.OnControlsChangedEvent -= OnControlsChanged;
+            InputBroker.OnControlsChangedEvent -= OnControlsChanged;
         }
 
         private void OnControlsChanged(PlayerInput playerInput)
