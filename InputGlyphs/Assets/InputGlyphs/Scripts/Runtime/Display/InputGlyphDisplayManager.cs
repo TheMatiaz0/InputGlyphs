@@ -1,4 +1,5 @@
 using System.Linq;
+using InputGlyphs.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +11,7 @@ namespace InputGlyphs.Display
         private PlayerInput PlayerInput;
 
         private PlayerInput _lastPlayerInput;
+        private ControlsChangedMessageBroker _messageBroker;
 
 #if UNITY_EDITOR
         private void Reset()
@@ -20,32 +22,42 @@ namespace InputGlyphs.Display
         
         private void Start()
         {
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
-            {
-                PlayerInput = PlayerInput.all.FirstOrDefault();
-            }
-            if (PlayerInput == null)
-            {
-                Debug.LogWarning("PlayerInput is not set.", this);
-            }
+            TryGetPlayerInput();
         }
 
-        private void Update()
+        private void TryGetPlayerInput()
         {
             if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
             {
                 PlayerInput = PlayerInput.all.FirstOrDefault();
             }
+            
+            if (PlayerInput == null)
+            {
+                Debug.LogError("PlayerInput is not set.", this);
+            }
+            else
+            {
+                if (PlayerInput.notificationBehavior is PlayerNotifications.SendMessages or PlayerNotifications.BroadcastMessages)
+                {
+                    if (!PlayerInput.TryGetComponent<ControlsChangedMessageBroker>(out _messageBroker))
+                    {
+                        _messageBroker = PlayerInput.gameObject.AddComponent<ControlsChangedMessageBroker>();
+                    }
+                }
+            }
+        }
+
+        private void Update()
+        {
+            TryGetPlayerInput();
 
             if (PlayerInput == _lastPlayerInput) return;
             if (_lastPlayerInput != null)
             {
                 UnregisterPlayerInputEvents(_lastPlayerInput);
             }
-            if (PlayerInput == null)
-            {
-                Debug.LogError("PlayerInput is not set.", this);
-            }
+
             else
             {
                 RegisterPlayerInputEvents(PlayerInput);
@@ -64,6 +76,10 @@ namespace InputGlyphs.Display
                 case PlayerNotifications.InvokeCSharpEvents:
                     playerInput.onControlsChanged += OnControlsChanged;
                     break;
+                case PlayerNotifications.SendMessages:
+                case PlayerNotifications.BroadcastMessages:
+                    _messageBroker.OnControlsChangedMessage += OnControlsChanged;
+                    break;
             }
         }
 
@@ -76,6 +92,10 @@ namespace InputGlyphs.Display
                     break;
                 case PlayerNotifications.InvokeCSharpEvents:
                     playerInput.onControlsChanged -= OnControlsChanged;
+                    break;
+                case PlayerNotifications.SendMessages:
+                case PlayerNotifications.BroadcastMessages:
+                    _messageBroker.OnControlsChangedMessage -= OnControlsChanged;
                     break;
             }
         }
@@ -95,12 +115,6 @@ namespace InputGlyphs.Display
             {
                 InputGlyphDisplayBridge.UpdateGlyphs(playerInput);
             }
-        }
-
-        // Support for PlayerNotifications.SendMessages AND PlayerNotifications.BroadcastMessages
-        private void OnControlsChanged()
-        {
-            OnControlsChanged(PlayerInput);
         }
     }
 }
