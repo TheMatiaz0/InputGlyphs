@@ -5,16 +5,21 @@ using UnityEngine.InputSystem;
 
 namespace InputGlyphs
 {
+    /// <summary>
+    /// Handles and transmits Unity's PlayerInput events allowing to use it for any purpose.
+    /// <example>Check <c>InputGlyphDisplayManager</c> for example implementation.</example>
+    /// </summary>
     public class InputBroker : MonoBehaviour
     {
         public event Action<PlayerInput> OnControlsChangedEvent;
+        public event Action<PlayerInput> OnDeviceLostEvent;
         
         [Header("Optional: InputBroker will try to find PlayerInput")]
         [SerializeField]
         private PlayerInput PlayerInput;
 
         private PlayerInput _lastPlayerInput;
-        private ControlsChangedMessageBroker _messageBroker;
+        private PlayerInputMessageBroker _messageBroker;
 
 #if UNITY_EDITOR
         private void Reset()
@@ -45,13 +50,18 @@ namespace InputGlyphs
                 {
                     if (!PlayerInput.TryGetComponent(out _messageBroker))
                     {
-                        _messageBroker = PlayerInput.gameObject.AddComponent<ControlsChangedMessageBroker>();
+                        _messageBroker = PlayerInput.gameObject.AddComponent<PlayerInputMessageBroker>();
                     }
                 }
             }
         }
 
         private void Update()
+        {
+            Scan();
+        }
+
+        private void Scan()
         {
             TryGetPlayerInput();
 
@@ -75,13 +85,16 @@ namespace InputGlyphs
             {
                 case PlayerNotifications.InvokeUnityEvents:
                     playerInput.controlsChangedEvent.AddListener(OnControlsChanged);
+                    playerInput.deviceLostEvent.AddListener(OnDeviceLost);
                     break;
                 case PlayerNotifications.InvokeCSharpEvents:
                     playerInput.onControlsChanged += OnControlsChanged;
+                    playerInput.onDeviceLost += OnDeviceLost;
                     break;
                 case PlayerNotifications.SendMessages:
                 case PlayerNotifications.BroadcastMessages:
                     _messageBroker.OnControlsChangedMessage += OnControlsChanged;
+                    _messageBroker.OnDeviceLostMessage += OnDeviceLost;
                     break;
             }
         }
@@ -92,13 +105,16 @@ namespace InputGlyphs
             {
                 case PlayerNotifications.InvokeUnityEvents:
                     playerInput.controlsChangedEvent.RemoveListener(OnControlsChanged);
+                    playerInput.deviceLostEvent.RemoveListener(OnDeviceLost);
                     break;
                 case PlayerNotifications.InvokeCSharpEvents:
                     playerInput.onControlsChanged -= OnControlsChanged;
+                    playerInput.onDeviceLost -= OnDeviceLost;
                     break;
                 case PlayerNotifications.SendMessages:
                 case PlayerNotifications.BroadcastMessages:
                     _messageBroker.OnControlsChangedMessage -= OnControlsChanged;
+                    _messageBroker.OnDeviceLostMessage -= OnDeviceLost;
                     break;
             }
         }
@@ -119,5 +135,28 @@ namespace InputGlyphs
                 OnControlsChangedEvent?.Invoke(playerInput);
             }
         }
+
+        private void OnDeviceLost(PlayerInput playerInput)
+        {
+            if (playerInput == PlayerInput)
+            {
+                OnDeviceLostEvent?.Invoke(playerInput);
+            }
+        }
+        
+        #if UNITY_EDITOR
+        
+        private void DebugDevices(PlayerInput playerInput, string info = "")
+        {
+            StringBuilder t = new($"[{playerInput.devices.Count}] {info}: ");
+            foreach (var device in playerInput.devices)
+            {
+                t.Append($"{device.name}, ");
+            }
+            
+            Debug.Log(t.ToString());
+        }
+        
+        #endif
     }
 }
