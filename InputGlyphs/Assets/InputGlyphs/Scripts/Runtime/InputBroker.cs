@@ -143,20 +143,5 @@ namespace InputGlyphs
                 OnDeviceLostEvent?.Invoke(playerInput);
             }
         }
-        
-        #if UNITY_EDITOR
-        
-        private void DebugDevices(PlayerInput playerInput, string info = "")
-        {
-            StringBuilder t = new($"[{playerInput.devices.Count}] {info}: ");
-            foreach (var device in playerInput.devices)
-            {
-                t.Append($"{device.name}, ");
-            }
-            
-            Debug.Log(t.ToString());
-        }
-        
-        #endif
     }
 }
