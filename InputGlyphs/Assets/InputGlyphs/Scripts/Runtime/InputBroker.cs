@@ -21,6 +21,8 @@ namespace InputGlyphs
         private PlayerInput _lastPlayerInput;
         private PlayerInputMessageBroker _messageBroker;
 
+        public PlayerInput PlayerInputReference => PlayerInput; 
+
 #if UNITY_EDITOR
         private void Reset()
         {
@@ -35,7 +37,7 @@ namespace InputGlyphs
 
         private void TryGetPlayerInput()
         {
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
+            if (PlayerInput == null && InputBrokerSettings.AutoCollectPlayerInput)
             {
                 PlayerInput = PlayerInput.all.FirstOrDefault();
             }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,6 +7,8 @@ namespace InputGlyphs.Display
 {
     public static class InputGlyphDisplayBridge
     {
+        public static event Action<IGlyphDisplay> OnRegisteredDisplay;
+        
         private static List<IGlyphDisplay> GlyphDisplays { get; } = new List<IGlyphDisplay>();
 
         public static void Register(IGlyphDisplay display)
@@ -13,6 +16,7 @@ namespace InputGlyphs.Display
             if (!GlyphDisplays.Contains(display))
             {
                 GlyphDisplays.Add(display);
+                OnRegisteredDisplay?.Invoke(display);
             }
             else
             {

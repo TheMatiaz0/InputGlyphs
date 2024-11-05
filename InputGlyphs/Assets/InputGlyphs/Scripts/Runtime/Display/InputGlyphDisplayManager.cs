@@ -14,7 +14,8 @@ namespace InputGlyphs.Display
                 return;
             }
             
-            InputBroker.OnControlsChangedEvent += OnControlsChanged;
+            InputBroker.OnControlsChangedEvent += UpdateGlyphs;
+            InputGlyphDisplayBridge.OnRegisteredDisplay += OnRegisteredDisplay;
         }
 
         private void OnDestroy()
@@ -24,10 +25,16 @@ namespace InputGlyphs.Display
                 return;
             }
             
-            InputBroker.OnControlsChangedEvent -= OnControlsChanged;
+            InputBroker.OnControlsChangedEvent -= UpdateGlyphs;
+            InputGlyphDisplayBridge.OnRegisteredDisplay -= OnRegisteredDisplay;
+        }
+        
+        private void OnRegisteredDisplay(IGlyphDisplay display)
+        {
+            UpdateGlyphs(InputBroker.PlayerInputReference);
         }
 
-        private void OnControlsChanged(PlayerInput playerInput)
+        private void UpdateGlyphs(PlayerInput playerInput)
         {
             InputGlyphDisplayBridge.UpdateGlyphs(playerInput);
         }
