@@ -30,6 +30,8 @@ namespace InputGlyphs.Display
         [SerializeField]
         public GlyphsLayoutData GlyphsLayoutData = GlyphsLayoutData.Default;
 
+        [SerializeField] private float GlyphScale = 1;
+
         private PlayerInput _lastPlayerInput;
         private List<string> _pathBuffer = new List<string>();
         private List<Texture2D> _actionTextureBuffer = new List<Texture2D>();
@@ -151,6 +153,7 @@ namespace InputGlyphs.Display
             // Create sprite asset for TextMeshPro
             _sharedSpriteAsset.spriteGlyphTable.Clear();
             _sharedSpriteAsset.spriteCharacterTable.Clear();
+            
             for (var i = 0; i < actionTextureIndexes.Count; i++)
             {
                 var actionTextureIndex = actionTextureIndexes[i];
@@ -163,12 +166,14 @@ namespace InputGlyphs.Display
                     0,
                     _packedTexture.height * rect.height * 0.8f,
                     _packedTexture.width * rect.width);
+                
                 var glyphRect = new GlyphRect(
                     Mathf.FloorToInt(_packedTexture.width * rect.xMin),
                     Mathf.FloorToInt(_packedTexture.height * rect.yMin),
                     Mathf.FloorToInt(_packedTexture.width * rect.width),
                     Mathf.FloorToInt(_packedTexture.height * rect.height));
-                var spriteGlyph = new TMP_SpriteGlyph((uint)i, glyphMetrics, glyphRect, 1, i);
+                
+                var spriteGlyph = new TMP_SpriteGlyph((uint)i, glyphMetrics, glyphRect, GlyphScale, i);
                 _sharedSpriteAsset.spriteGlyphTable.Add(spriteGlyph);
 
                 // Create character
