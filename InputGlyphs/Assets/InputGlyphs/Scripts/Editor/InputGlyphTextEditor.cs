@@ -20,6 +20,10 @@ namespace InputGlyphs.Display.Editor
             EditorGUILayout.LabelField("Enter the following tag into the text:");
             using (new EditorGUI.IndentLevelScope())
             {
+                if (glyphText.InputActionReferences == null)
+                {
+                    return;
+                }
                 for (int i = 0; i < glyphText.InputActionReferences.Length; i++)
                 {
                     if (glyphText.InputActionReferences[i] == null)
