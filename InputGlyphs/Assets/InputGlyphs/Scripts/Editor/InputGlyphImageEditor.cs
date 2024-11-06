@@ -13,7 +13,7 @@ namespace InputGlyphs.Display.Editor
             var imageProperty = serializedObject.FindProperty(nameof(InputGlyphImage.Image));
             EditorGUILayout.PropertyField(imageProperty);
 
-            var inputActionReferenceProperty = serializedObject.FindProperty(nameof(InputGlyphImage.InputActionReference));
+            var inputActionReferenceProperty = serializedObject.FindProperty(nameof(InputGlyphImage.inputActionReferenceField));
             EditorGUILayout.PropertyField(inputActionReferenceProperty);
 
             var glyphsLayoutDataProperty = serializedObject.FindProperty(nameof(InputGlyphImage.GlyphsLayoutData));

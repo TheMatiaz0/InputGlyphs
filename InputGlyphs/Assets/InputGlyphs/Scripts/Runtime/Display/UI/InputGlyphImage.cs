@@ -16,11 +16,11 @@ namespace InputGlyphs.Display
 
         public InputActionReference InputActionReference
         {
-            get => inputActionReference;
+            get => inputActionReferenceField;
             set
             {
-                var shouldRefreshGlyph = inputActionReference == null && value != null || inputActionReference != null && value != null;
-                inputActionReference = value;
+                var shouldRefreshGlyph = inputActionReferenceField == null && value != null || inputActionReferenceField != null && value != null;
+                inputActionReferenceField = value;
 
                 if (shouldRefreshGlyph)
                 {
@@ -34,7 +34,7 @@ namespace InputGlyphs.Display
         public Image Image = null;
 
         [FormerlySerializedAs("InputActionReference")] [SerializeField]
-        private InputActionReference inputActionReference = null;
+        public InputActionReference inputActionReferenceField = null;
 
         [SerializeField]
         public GlyphsLayoutData GlyphsLayoutData = GlyphsLayoutData.Default;
@@ -64,7 +64,7 @@ namespace InputGlyphs.Display
         protected override void OnEnable()
         {
             base.OnEnable();
-            if (inputActionReference != null)
+            if (inputActionReferenceField != null)
             {
                 InputGlyphDisplayBridge.Register(this);
             }
@@ -73,7 +73,7 @@ namespace InputGlyphs.Display
         protected override void OnDisable()
         {
             base.OnDisable();
-            if (inputActionReference != null)
+            if (inputActionReferenceField != null)
             {
                 InputGlyphDisplayBridge.Unregister(this);
             }
@@ -92,7 +92,7 @@ namespace InputGlyphs.Display
 
         public void UpdateGlyphs(ReadOnlyArray<InputDevice> devices, string controlScheme)
         {
-            if (InputLayoutPathUtility.TryGetActionBindingPath(inputActionReference?.action, controlScheme, _pathBuffer))
+            if (InputLayoutPathUtility.TryGetActionBindingPath(inputActionReferenceField?.action, controlScheme, _pathBuffer))
             {
                 if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, devices, _pathBuffer, GlyphsLayoutData))
                 {
