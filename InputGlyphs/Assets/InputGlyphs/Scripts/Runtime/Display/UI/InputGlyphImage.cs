@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace InputGlyphs.Display
@@ -13,11 +14,27 @@ namespace InputGlyphs.Display
     {
         public bool IsVisible => Image != null && Image.isActiveAndEnabled;
 
+        public InputActionReference InputActionReference
+        {
+            get => inputActionReference;
+            set
+            {
+                var shouldRefreshGlyph = inputActionReference == null && value != null || inputActionReference != null && value != null;
+                inputActionReference = value;
+
+                if (shouldRefreshGlyph)
+                {
+                    InputGlyphDisplayBridge.Unregister(this);
+                    InputGlyphDisplayBridge.Register(this);
+                }
+            }
+        } 
+
         [SerializeField]
         public Image Image = null;
 
-        [SerializeField]
-        public InputActionReference InputActionReference = null;
+        [FormerlySerializedAs("InputActionReference")] [SerializeField]
+        private InputActionReference inputActionReference = null;
 
         [SerializeField]
         public GlyphsLayoutData GlyphsLayoutData = GlyphsLayoutData.Default;
@@ -47,13 +64,19 @@ namespace InputGlyphs.Display
         protected override void OnEnable()
         {
             base.OnEnable();
-            InputGlyphDisplayBridge.Register(this);
+            if (inputActionReference != null)
+            {
+                InputGlyphDisplayBridge.Register(this);
+            }
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            InputGlyphDisplayBridge.Unregister(this);
+            if (inputActionReference != null)
+            {
+                InputGlyphDisplayBridge.Unregister(this);
+            }
         }
 
         protected override void OnDestroy()
@@ -69,7 +92,7 @@ namespace InputGlyphs.Display
 
         public void UpdateGlyphs(ReadOnlyArray<InputDevice> devices, string controlScheme)
         {
-            if (InputLayoutPathUtility.TryGetActionBindingPath(InputActionReference?.action, controlScheme, _pathBuffer))
+            if (InputLayoutPathUtility.TryGetActionBindingPath(inputActionReference?.action, controlScheme, _pathBuffer))
             {
                 if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, devices, _pathBuffer, GlyphsLayoutData))
                 {
