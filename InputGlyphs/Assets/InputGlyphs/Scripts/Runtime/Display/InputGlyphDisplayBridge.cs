@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace InputGlyphs.Display
@@ -18,17 +17,13 @@ namespace InputGlyphs.Display
                 GlyphDisplays.Add(display);
                 OnRegisteredDisplay?.Invoke(display);
             }
-            else
-            {
-                Debug.LogWarning("Display is already registered!");
-            }
         }
 
         public static void Unregister(IGlyphDisplay display)
         {
-            if (!GlyphDisplays.Remove(display))
+            if (GlyphDisplays.Contains(display))
             {
-                Debug.LogWarning("Can't unregister display that wasn't registered!");
+                GlyphDisplays.Remove(display);
             }
         }
         
