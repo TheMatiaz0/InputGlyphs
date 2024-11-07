@@ -12,8 +12,6 @@ namespace InputGlyphs.Display
 {
     public sealed class InputGlyphImage : UIBehaviour, ILayoutElement, IGlyphDisplay
     {
-        public bool IsVisible => Image != null && Image.isActiveAndEnabled;
-
         public InputActionReference InputActionReference
         {
             get => inputActionReferenceField;

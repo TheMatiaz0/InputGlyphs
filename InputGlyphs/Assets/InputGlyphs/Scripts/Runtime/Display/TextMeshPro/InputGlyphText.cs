@@ -16,8 +16,6 @@ namespace InputGlyphs.Display
     {
         private static readonly int MainTex = Shader.PropertyToID("_MainTex");
 
-        public bool IsVisible => Text != null && Text.isActiveAndEnabled;
-
         [SerializeField]
         public TMP_Text Text = null;
 

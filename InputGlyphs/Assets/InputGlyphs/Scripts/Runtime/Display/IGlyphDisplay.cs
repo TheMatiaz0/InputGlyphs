@@ -6,7 +6,6 @@ namespace InputGlyphs.Display
 {
     public interface IGlyphDisplay
     {
-        bool IsVisible { get; }
         void UpdateGlyphs(ReadOnlyArray<InputDevice> devices, string controlScheme);
     }
 }

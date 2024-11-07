@@ -9,8 +9,6 @@ namespace InputGlyphs.Display
 {
     public class InputGlyphSprite : MonoBehaviour, IGlyphDisplay
     {
-        public bool IsVisible => SpriteRenderer != null && SpriteRenderer.enabled && SpriteRenderer.isVisible;
-
         [SerializeField]
         public SpriteRenderer SpriteRenderer = null;
 
