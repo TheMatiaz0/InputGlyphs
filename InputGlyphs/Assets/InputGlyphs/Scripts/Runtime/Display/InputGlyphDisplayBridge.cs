@@ -36,10 +36,7 @@ namespace InputGlyphs.Display
             
             foreach (var glyphDisplay in GlyphDisplays)
             {
-                if (glyphDisplay.IsVisible)
-                {
-                    glyphDisplay.UpdateGlyphs(playerInput.devices, playerInput.currentControlScheme);
-                }
+                glyphDisplay.UpdateGlyphs(playerInput.devices, playerInput.currentControlScheme);
             }
         }
     }
