@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.2] - 2024-12-09
+### Modified
+- Supported `DISABLESTEAMWORKS` Assembly Definition.
+
 ## [1.2.1] - 2024-10-31
 ### Modified
 - Modified to automatically collect PlayerInput when it is not set.
