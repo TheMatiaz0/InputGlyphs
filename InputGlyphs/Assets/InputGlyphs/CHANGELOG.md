@@ -3,6 +3,8 @@
 ## [1.2.2] - Development
 ### Modified
 - Supported `DISABLESTEAMWORKS` Assembly Definition.
+- Changed to use the parent path if the image cannot be found.
+  - Example: `leftStick/x` -> `leftStick`
 
 ## [1.2.1] - 2024-10-31
 ### Modified
