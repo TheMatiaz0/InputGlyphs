@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.2.2] - 2024-12-09
+## [1.2.2] - Development
 ### Modified
 - Supported `DISABLESTEAMWORKS` Assembly Definition.
 
