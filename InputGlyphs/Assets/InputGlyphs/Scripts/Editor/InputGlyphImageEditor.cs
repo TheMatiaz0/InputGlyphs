@@ -1,5 +1,4 @@
 #if INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
-using InputGlyphs.Editor;
 using UnityEditor;
 
 namespace InputGlyphs.Display.Editor
@@ -14,10 +13,7 @@ namespace InputGlyphs.Display.Editor
             var imageProperty = serializedObject.FindProperty(nameof(InputGlyphImage.Image));
             EditorGUILayout.PropertyField(imageProperty);
 
-            var playerInputProperty = serializedObject.FindProperty(nameof(InputGlyphImage.PlayerInput));
-            EditorGUILayout.PropertyField(playerInputProperty);
-
-            var inputActionReferenceProperty = serializedObject.FindProperty(nameof(InputGlyphImage.InputActionReference));
+            var inputActionReferenceProperty = serializedObject.FindProperty(nameof(InputGlyphImage.inputActionReferenceField));
             EditorGUILayout.PropertyField(inputActionReferenceProperty);
 
             var glyphsLayoutDataProperty = serializedObject.FindProperty(nameof(InputGlyphImage.GlyphsLayoutData));
@@ -35,21 +31,6 @@ namespace InputGlyphs.Display.Editor
             }
 
             serializedObject.ApplyModifiedProperties();
-
-            var playerInputError = false;
-            foreach (var t in targets)
-            {
-                var glyphImage = (InputGlyphImage)t;
-                if (glyphImage.PlayerInput != null && !InputGlyphEditorUtility.ValidatePlayerInputNotificationBehavior(glyphImage.PlayerInput))
-                {
-                    playerInputError = true;
-                    break;
-                }
-            }
-            if (playerInputError)
-            {
-                EditorGUILayout.HelpBox(InputGlyphEditorUtility.GetPlayerInputNotificationBehaviorErrorMessage(), MessageType.Error);
-            }
         }
     }
 }
