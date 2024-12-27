@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.3] - 2024-12-27 - Development
+### Fixed
+- Fixed errors during Linux build. (Switch Pro Controller, DualSense Controller)
+
 ## [1.2.2] - 2024-12-10
 ### Modified
 - Supported `DISABLESTEAMWORKS` Assembly Definition.
