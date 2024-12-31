@@ -1,5 +1,6 @@
 #if INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
 using System.Collections.Generic;
+using System.Linq;
 using InputGlyphs.Loaders.Utils;
 using InputGlyphs.Utils;
 using UnityEngine;
@@ -33,24 +34,13 @@ namespace InputGlyphs.Loaders
 
         public bool LoadGlyph(Texture2D texture, IReadOnlyList<InputDevice> activeDevices, string inputLayoutPath)
         {
-            InputGlyphTextureMap activeTextureMap = null;
-            for (var i = 0; i < activeDevices.Count; i++)
-            {
-                var activeDevice = activeDevices[i];
-                activeTextureMap = GetTextureMap(activeDevice);
-                if (activeTextureMap == null && activeDevice is Gamepad)
-                {
-                    activeTextureMap = _fallbackTextureMap;
-                }
-                if (activeTextureMap != null)
-                {
-                    break;
-                }
-            }
-            if (activeTextureMap == null)
+            var supportedDevice = TryGetSupportedDevice(activeDevices);
+            if (supportedDevice == null)
             {
                 return false;
             }
+            
+            var activeTextureMap = GetTextureMap(supportedDevice);
 
             var localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
             if (activeTextureMap.TryGetTexture(localPath, out var result))
@@ -64,9 +54,14 @@ namespace InputGlyphs.Loaders
             return false;
         }
 
-        private InputGlyphTextureMap GetTextureMap(InputDevice device)
+        private static Gamepad TryGetSupportedDevice(IReadOnlyList<InputDevice> activeDevices)
         {
-            switch (device)
+            return activeDevices.OfType<Gamepad>().FirstOrDefault();
+        }
+
+        private InputGlyphTextureMap GetTextureMap(Gamepad gamepad)
+        {
+            switch (gamepad)
             {
                 case XInputController:
                     return _xboxControllerTextureMap;
@@ -79,11 +74,8 @@ namespace InputGlyphs.Loaders
                     return _switchProControllerTextureMap;
 #endif
 
-                case Gamepad:
-                    return _fallbackTextureMap;
-
                 default:
-                    return null;
+                    return _fallbackTextureMap;
             }
         }
     }
