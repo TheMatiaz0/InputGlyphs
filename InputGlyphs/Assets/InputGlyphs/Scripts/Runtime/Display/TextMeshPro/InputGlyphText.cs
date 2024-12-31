@@ -30,7 +30,6 @@ namespace InputGlyphs.Display
 
         [SerializeField] private float GlyphScale = 1;
 
-        private PlayerInput _lastPlayerInput;
         private List<string> _pathBuffer = new List<string>();
         private List<Texture2D> _actionTextureBuffer = new List<Texture2D>();
         private List<Tuple<string, int>> _actionTextureIndexes = new List<Tuple<string, int>>();

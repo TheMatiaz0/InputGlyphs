@@ -7,7 +7,6 @@ namespace InputGlyphs.Utils
 {
     public static class InputLayoutPathUtility
     {
-        private static StringBuilder _stringBuilder = new StringBuilder();
         private static List<int> _bindingIndexBuffer = new List<int>();
 
         /// <summary>
@@ -82,6 +81,13 @@ namespace InputGlyphs.Utils
                 results.Add(action.bindings[bindingIndex].effectivePath);
             }
             return results.Count > 0;
+        }
+
+        public static bool HasPathComponent(string path)
+        {
+            return path.IndexOf('<') >= 0
+                || path.IndexOf('{') >= 0
+                || path.IndexOf('(') >= 0;
         }
     }
 }

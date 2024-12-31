@@ -37,7 +37,6 @@ namespace InputGlyphs.Display
         [SerializeField]
         public GlyphsLayoutData GlyphsLayoutData = GlyphsLayoutData.Default;
         
-        private PlayerInput _lastPlayerInput;
         private List<string> _pathBuffer = new List<string>();
         private Texture2D _texture;
 
