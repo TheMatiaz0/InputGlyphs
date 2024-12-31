@@ -41,8 +41,18 @@ namespace InputGlyphs.Loaders
             }
             
             var activeTextureMap = GetTextureMap(supportedDevice);
-
             var localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
+
+            if (InputLayoutPathUtility.HasPathComponent(inputLayoutPath))
+            {
+                var control = supportedDevice.TryGetChildControl(inputLayoutPath);
+                if (control != null)
+                {
+                    inputLayoutPath = control.path;
+                    localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
+                }
+            }
+
             if (activeTextureMap.TryGetTexture(localPath, out var result))
             {
                 texture.Reinitialize(result.width, result.height, TextureFormat.ARGB32, false);
