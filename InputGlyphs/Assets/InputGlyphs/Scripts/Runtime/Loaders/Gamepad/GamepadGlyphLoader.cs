@@ -6,7 +6,9 @@ using InputGlyphs.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.DualShock;
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_WSA
 using UnityEngine.InputSystem.Switch;
+#endif
 using UnityEngine.InputSystem.XInput;
 
 namespace InputGlyphs.Loaders
@@ -67,8 +69,10 @@ namespace InputGlyphs.Loaders
                 case DualShockGamepad:
                     return _playstationControllerTextureMap;
 
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_WSA
                 case SwitchProControllerHID:
                     return _switchProControllerTextureMap;
+#endif
 
                 default:
                     return _fallbackTextureMap;
