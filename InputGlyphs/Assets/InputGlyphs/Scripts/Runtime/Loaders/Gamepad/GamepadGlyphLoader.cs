@@ -1,5 +1,6 @@
 #if INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
 using System.Collections.Generic;
+using System.Linq;
 using InputGlyphs.Loaders.Utils;
 using InputGlyphs.Utils;
 using UnityEngine;
@@ -33,36 +34,27 @@ namespace InputGlyphs.Loaders
 
         public bool LoadGlyph(Texture2D texture, IReadOnlyList<InputDevice> activeDevices, string inputLayoutPath)
         {
-            InputGlyphTextureMap activeTextureMap = null;
-            for (var i = 0; i < activeDevices.Count; i++)
+            var supportedDevice = activeDevices.OfType<Gamepad>().FirstOrDefault();
+            if (supportedDevice == null)
             {
-                var activeDevice = activeDevices[i];
-                activeTextureMap = GetTextureMap(activeDevice);
-                if (activeTextureMap == null && activeDevice is Gamepad)
-                {
-                    activeTextureMap = _fallbackTextureMap;
-                }
-                if (activeTextureMap != null)
-                {
-                    break;
-                }
+                return false;
             }
+
+            var textureMap = GetTextureMap(supportedDevice);
+            var activeTextureMap = textureMap != null ? textureMap : _fallbackTextureMap;
             if (activeTextureMap == null)
             {
                 return false;
             }
 
             var localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
-            foreach (var device in activeDevices)
+            if (InputLayoutPathUtility.HasPathComponent(inputLayoutPath))
             {
-                if (InputLayoutPathUtility.HasPathComponent(inputLayoutPath))
+                var control = supportedDevice.TryGetChildControl(inputLayoutPath);
+                if (control != null)
                 {
-                    var control = device.TryGetChildControl(inputLayoutPath);
-                    if (control != null)
-                    {
-                        inputLayoutPath = control.path;
-                        localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
-                    }
+                    inputLayoutPath = control.path;
+                    localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
                 }
             }
 
