@@ -18,23 +18,20 @@ namespace InputGlyphs.Loaders.Utils
 
         public bool LoadGlyph(Texture2D texture, IReadOnlyList<InputDevice> activeDevices, string inputLayoutPath)
         {
-            if (!IsAnyDeviceSupported(activeDevices))
+            var supportedDevice = activeDevices.OfType<T>().FirstOrDefault();
+            if (supportedDevice == null)
             {
                 return false;
             }
-            
-            var localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
 
-            foreach (var device in activeDevices)
+            var localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
+            if (InputLayoutPathUtility.HasPathComponent(inputLayoutPath))
             {
-                if (InputLayoutPathUtility.HasPathComponent(inputLayoutPath))
+                var control = supportedDevice.TryGetChildControl(inputLayoutPath);
+                if (control != null)
                 {
-                    var control = device.TryGetChildControl(inputLayoutPath);
-                    if (control != null)
-                    {
-                        inputLayoutPath = control.path;
-                        localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
-                    }
+                    inputLayoutPath = control.path;
+                    localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
                 }
             }
 
@@ -50,11 +47,6 @@ namespace InputGlyphs.Loaders.Utils
             }
 
             return false;
-        }
-
-        private static bool IsAnyDeviceSupported(IReadOnlyList<InputDevice> activeDevices)
-        {
-            return activeDevices.OfType<T>().Any();
         }
     }
 }
