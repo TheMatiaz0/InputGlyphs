@@ -42,6 +42,10 @@ namespace InputGlyphs.Loaders
 
             var textureMap = GetTextureMap(supportedDevice);
             var activeTextureMap = textureMap != null ? textureMap : _fallbackTextureMap;
+            if (activeTextureMap == null)
+            {
+                return false;
+            }
 
             var localPath = InputLayoutPathUtility.RemoveRoot(inputLayoutPath);
             if (InputLayoutPathUtility.HasPathComponent(inputLayoutPath))
