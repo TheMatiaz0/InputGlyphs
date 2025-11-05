@@ -11,7 +11,7 @@ namespace InputGlyphs.Loaders
 {
     public class SteamGamepadGlyphLoader : IInputGlyphLoader
     {
-        private const ESteamInputGlyphSize GlyphSize = ESteamInputGlyphSize.k_ESteamInputGlyphSize_Small;
+        private const GlyphSize Size = GlyphSize.Small;
         
         public bool LoadGlyph(Texture2D texture, IReadOnlyList<InputDevice> activeDevices, string inputLayoutPath)
         {
@@ -23,7 +23,7 @@ namespace InputGlyphs.Loaders
         
             // Get path of Glyph image file.
             var steamInputAction = SteamInputAdapter.GetSteamInputAction(supportedDevice, inputLayoutPath);
-            var glyphPath = SteamInput.GetGlyphPNGForActionOrigin(steamInputAction, GlyphSize, 0);
+            var glyphPath = SteamInput.GetPngActionGlyphForOrigin(steamInputAction, Size);
             
             return !string.IsNullOrEmpty(glyphPath) && LoadImage(texture, glyphPath);
         }
