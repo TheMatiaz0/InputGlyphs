@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "com.eviltwo.input-glyphs": "https://github.com/TheMatiaz0/InputGlyphs.git?path=InputGlyphs/Assets/InputGlyphs#facepunch-api-migration",
-    "com.thematiaz0.facepunch.steamworks": "https://github.com/TheMatiaz0/Facepunch.Steamworks.git?path=UnityPlugin#steam-input-implementation",
+    "com.eviltwo.unity-steam-input-adapter": "https://github.com/TheMatiaz0/UnitySteamInputAdapter.git?path=UnitySteamInputAdapter/Assets/UnitySteamInputAdapter",
+    "com.thematiaz0.facepunch.steamworks": "https://github.com/TheMatiaz0/Facepunch.Steamworks.git?path=UnityPlugin",
     "com.unity.collab-proxy": "2.5.2",
     "com.unity.feature.development": "1.0.1",
     "com.unity.inputsystem": "1.11.2",
