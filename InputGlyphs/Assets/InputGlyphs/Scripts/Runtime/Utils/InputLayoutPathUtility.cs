@@ -7,7 +7,6 @@ namespace InputGlyphs.Utils
 {
     public static class InputLayoutPathUtility
     {
-        private static StringBuilder _stringBuilder = new StringBuilder();
         private static List<int> _bindingIndexBuffer = new List<int>();
 
         /// <summary>

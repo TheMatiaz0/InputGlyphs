@@ -1,6 +1,6 @@
-namespace InputGlyphs.Display
+namespace InputGlyphs
 {
-    public static class InputGlyphDisplaySettings
+    public static class InputBrokerSettings
     {
         /// <summary>
         /// Automatically collect when PlayerInput is null.

@@ -1,20 +1,20 @@
 #if INPUT_SYSTEM && ENABLE_INPUT_SYSTEM && SUPPORT_TMPRO
+using InputGlyphs.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using InputGlyphs.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 using UnityEngine.Profiling;
 using UnityEngine.TextCore;
 
 namespace InputGlyphs.Display
 {
-    public class InputGlyphText : MonoBehaviour
+    public class InputGlyphText : MonoBehaviour, IGlyphDisplay
     {
-        public static int PackedTextureSize = 2048;
+        private static readonly int MainTex = Shader.PropertyToID("_MainTex");
 
         [SerializeField]
         public TMP_Text Text = null;
@@ -23,15 +23,13 @@ namespace InputGlyphs.Display
         public Material Material = null;
 
         [SerializeField]
-        public PlayerInput PlayerInput = null;
-
-        [SerializeField]
         public InputActionReference[] InputActionReferences = null;
 
         [SerializeField]
         public GlyphsLayoutData GlyphsLayoutData = GlyphsLayoutData.Default;
 
-        private PlayerInput _lastPlayerInput;
+        [SerializeField] private float GlyphScale = 1;
+
         private List<string> _pathBuffer = new List<string>();
         private List<Texture2D> _actionTextureBuffer = new List<Texture2D>();
         private List<Tuple<string, int>> _actionTextureIndexes = new List<Tuple<string, int>>();
@@ -43,11 +41,6 @@ namespace InputGlyphs.Display
         private void Reset()
         {
             Text = GetComponent<TMP_Text>();
-#if UNITY_2022_3_OR_NEWER
-            PlayerInput = FindAnyObjectByType<PlayerInput>();
-#else
-            PlayerInput = FindObjectOfType<PlayerInput>();
-#endif
         }
 
         private void Awake()
@@ -58,32 +51,11 @@ namespace InputGlyphs.Display
             }
             _packedTexture = new Texture2D(2, 2);
             _sharedMaterial = new Material(Material);
-            _sharedMaterial.SetTexture("_MainTex", _packedTexture);
+            _sharedMaterial.SetTexture(MainTex, _packedTexture);
             _sharedSpriteAsset = CreateEmptySpriteAsset();
             _sharedSpriteAsset.material = _sharedMaterial;
             _sharedSpriteAsset.spriteSheet = _packedTexture;
             Text.spriteAsset = _sharedSpriteAsset;
-        }
-
-        private void Start()
-        {
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
-            {
-                PlayerInput = PlayerInput.all.FirstOrDefault();
-            }
-            if (PlayerInput == null)
-            {
-                Debug.LogWarning("PlayerInput is not set.", this);
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (_lastPlayerInput != null)
-            {
-                UnregisterPlayerInputEvents(_lastPlayerInput);
-                _lastPlayerInput = null;
-            }
         }
 
         private void OnDestroy()
@@ -101,87 +73,25 @@ namespace InputGlyphs.Display
             _sharedSpriteAsset = null;
         }
 
-        private void Update()
+        private void OnEnable()
         {
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
-            {
-                PlayerInput = PlayerInput.all.FirstOrDefault();
-            }
-
-            if (PlayerInput != _lastPlayerInput)
-            {
-                if (_lastPlayerInput != null)
-                {
-                    UnregisterPlayerInputEvents(_lastPlayerInput);
-                }
-                if (PlayerInput == null)
-                {
-                    Debug.LogError("PlayerInput is not set.", this);
-                }
-                else
-                {
-                    RegisterPlayerInputEvents(PlayerInput);
-                    UpdateGlyphs(PlayerInput);
-                }
-                _lastPlayerInput = PlayerInput;
-            }
+            InputGlyphDisplayBridge.Register(this);
         }
 
-        private void RegisterPlayerInputEvents(PlayerInput playerInput)
+        private void OnDisable()
         {
-            switch (playerInput.notificationBehavior)
-            {
-                case PlayerNotifications.InvokeUnityEvents:
-                    playerInput.controlsChangedEvent.AddListener(OnControlsChanged);
-                    break;
-                case PlayerNotifications.InvokeCSharpEvents:
-                    playerInput.onControlsChanged += OnControlsChanged;
-                    break;
-            }
+            InputGlyphDisplayBridge.Unregister(this);
         }
 
-        private void UnregisterPlayerInputEvents(PlayerInput playerInput)
-        {
-            switch (playerInput.notificationBehavior)
-            {
-                case PlayerNotifications.InvokeUnityEvents:
-                    playerInput.controlsChangedEvent.RemoveListener(OnControlsChanged);
-                    break;
-                case PlayerNotifications.InvokeCSharpEvents:
-                    playerInput.onControlsChanged -= OnControlsChanged;
-                    break;
-            }
-        }
-
-        private void OnControlsChanged(PlayerInput playerInput)
-        {
-            if (playerInput == PlayerInput)
-            {
-                UpdateGlyphs(playerInput);
-            }
-        }
-
-        private void UpdateGlyphs(PlayerInput playerInput)
+        public void UpdateGlyphs(ReadOnlyArray<InputDevice> devices, string controlScheme)
         {
             Profiler.BeginSample("UpdateGlyphs");
-
-            if (!playerInput.isActiveAndEnabled)
-            {
-                return;
-            }
-
-            var devices = playerInput.devices;
-            if (devices.Count == 0)
-            {
-                Debug.LogWarning("No devices are connected.", this);
-                return;
-            }
-
+            
             _actionTextureIndexes.Clear();
             for (var i = 0; i < InputActionReferences.Length; i++)
             {
                 var actionReference = InputActionReferences[i];
-                if (InputLayoutPathUtility.TryGetActionBindingPath(actionReference?.action, PlayerInput.currentControlScheme, _pathBuffer))
+                if (InputLayoutPathUtility.TryGetActionBindingPath(actionReference?.action, controlScheme, _pathBuffer))
                 {
                     Texture2D texture;
                     if (i < _actionTextureBuffer.Count)
@@ -195,7 +105,7 @@ namespace InputGlyphs.Display
                     }
                     if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(texture, devices, _pathBuffer, GlyphsLayoutData))
                     {
-                        _actionTextureIndexes.Add(Tuple.Create(actionReference.action.name, i));
+                        _actionTextureIndexes.Add(Tuple.Create(actionReference?.action.name, i));
                     }
                 }
             }
@@ -240,6 +150,7 @@ namespace InputGlyphs.Display
             // Create sprite asset for TextMeshPro
             _sharedSpriteAsset.spriteGlyphTable.Clear();
             _sharedSpriteAsset.spriteCharacterTable.Clear();
+            
             for (var i = 0; i < actionTextureIndexes.Count; i++)
             {
                 var actionTextureIndex = actionTextureIndexes[i];
@@ -252,12 +163,14 @@ namespace InputGlyphs.Display
                     0,
                     _packedTexture.height * rect.height * 0.8f,
                     _packedTexture.width * rect.width);
+                
                 var glyphRect = new GlyphRect(
                     Mathf.FloorToInt(_packedTexture.width * rect.xMin),
                     Mathf.FloorToInt(_packedTexture.height * rect.yMin),
                     Mathf.FloorToInt(_packedTexture.width * rect.width),
                     Mathf.FloorToInt(_packedTexture.height * rect.height));
-                var spriteGlyph = new TMP_SpriteGlyph((uint)i, glyphMetrics, glyphRect, 1, i);
+                
+                var spriteGlyph = new TMP_SpriteGlyph((uint)i, glyphMetrics, glyphRect, GlyphScale, i);
                 _sharedSpriteAsset.spriteGlyphTable.Add(spriteGlyph);
 
                 // Create character

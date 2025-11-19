@@ -69,9 +69,9 @@ namespace InputGlyphs.Loaders
             return false;
         }
 
-        private InputGlyphTextureMap GetTextureMap(InputDevice device)
+        private InputGlyphTextureMap GetTextureMap(Gamepad gamepad)
         {
-            switch (device)
+            switch (gamepad)
             {
                 case XInputController:
                     return _xboxControllerTextureMap;
@@ -84,11 +84,8 @@ namespace InputGlyphs.Loaders
                     return _switchProControllerTextureMap;
 #endif
 
-                case Gamepad:
-                    return _fallbackTextureMap;
-
                 default:
-                    return null;
+                    return _fallbackTextureMap;
             }
         }
     }

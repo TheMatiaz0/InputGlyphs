@@ -1,30 +1,42 @@
 #if INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
-using System.Collections.Generic;
-using System.Linq;
 using InputGlyphs.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace InputGlyphs.Display
 {
-    public class InputGlyphImage : UIBehaviour, ILayoutElement
+    public sealed class InputGlyphImage : UIBehaviour, ILayoutElement, IGlyphDisplay
     {
+        public InputActionReference InputActionReference
+        {
+            get => inputActionReferenceField;
+            set
+            {
+                var shouldRefreshGlyph = inputActionReferenceField == null && value != null || inputActionReferenceField != null && value != null;
+                inputActionReferenceField = value;
+
+                if (shouldRefreshGlyph)
+                {
+                    InputGlyphDisplayBridge.Unregister(this);
+                    InputGlyphDisplayBridge.Register(this);
+                }
+            }
+        } 
+
         [SerializeField]
         public Image Image = null;
 
-        [SerializeField]
-        public PlayerInput PlayerInput = null;
-
-        [SerializeField]
-        public InputActionReference InputActionReference = null;
+        [FormerlySerializedAs("InputActionReference")] [SerializeField]
+        public InputActionReference inputActionReferenceField = null;
 
         [SerializeField]
         public GlyphsLayoutData GlyphsLayoutData = GlyphsLayoutData.Default;
-
-        private Vector2 _defaultSizeDelta;
-        private PlayerInput _lastPlayerInput;
+        
         private List<string> _pathBuffer = new List<string>();
         private Texture2D _texture;
 
@@ -33,13 +45,8 @@ namespace InputGlyphs.Display
         {
             base.Reset();
             Image = GetComponent<Image>();
-#if UNITY_2022_3_OR_NEWER
-            PlayerInput = FindAnyObjectByType<PlayerInput>();
-#else
-            PlayerInput = FindObjectOfType<PlayerInput>();
-#endif
         }
-#endif // UNITY_EDITOR
+#endif
 
         protected override void Awake()
         {
@@ -48,30 +55,24 @@ namespace InputGlyphs.Display
             {
                 Image = GetComponent<Image>();
             }
-            _defaultSizeDelta = Image.rectTransform.sizeDelta;
             _texture = new Texture2D(2, 2);
         }
 
-        protected override void Start()
+        protected override void OnEnable()
         {
-            base.Start();
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
+            base.OnEnable();
+            if (inputActionReferenceField != null)
             {
-                PlayerInput = PlayerInput.all.FirstOrDefault();
-            }
-            if (PlayerInput == null)
-            {
-                Debug.LogWarning("PlayerInput is not set.", this);
+                InputGlyphDisplayBridge.Register(this);
             }
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            if (_lastPlayerInput != null)
+            if (inputActionReferenceField != null)
             {
-                UnregisterPlayerInputEvents(_lastPlayerInput);
-                _lastPlayerInput = null;
+                InputGlyphDisplayBridge.Unregister(this);
             }
         }
 
@@ -82,90 +83,16 @@ namespace InputGlyphs.Display
             _texture = null;
             if (Image != null)
             {
-                Destroy(Image.sprite);
                 Image.sprite = null;
             }
         }
 
-        protected virtual void Update()
+        public void UpdateGlyphs(ReadOnlyArray<InputDevice> devices, string controlScheme)
         {
-            if (PlayerInput == null && InputGlyphDisplaySettings.AutoCollectPlayerInput)
-            {
-                PlayerInput = PlayerInput.all.FirstOrDefault();
-            }
-
-            if (PlayerInput != _lastPlayerInput)
-            {
-                if (_lastPlayerInput != null)
-                {
-                    UnregisterPlayerInputEvents(_lastPlayerInput);
-                }
-                if (PlayerInput == null)
-                {
-                    Debug.LogError("PlayerInput is not set.", this);
-                }
-                else
-                {
-                    RegisterPlayerInputEvents(PlayerInput);
-                    UpdateGlyphs(PlayerInput);
-                }
-                _lastPlayerInput = PlayerInput;
-            }
-        }
-
-        private void RegisterPlayerInputEvents(PlayerInput playerInput)
-        {
-            switch (playerInput.notificationBehavior)
-            {
-                case PlayerNotifications.InvokeUnityEvents:
-                    playerInput.controlsChangedEvent.AddListener(OnControlsChanged);
-                    break;
-                case PlayerNotifications.InvokeCSharpEvents:
-                    playerInput.onControlsChanged += OnControlsChanged;
-                    break;
-            }
-        }
-
-        private void UnregisterPlayerInputEvents(PlayerInput playerInput)
-        {
-            switch (playerInput.notificationBehavior)
-            {
-                case PlayerNotifications.InvokeUnityEvents:
-                    playerInput.controlsChangedEvent.RemoveListener(OnControlsChanged);
-                    break;
-                case PlayerNotifications.InvokeCSharpEvents:
-                    playerInput.onControlsChanged -= OnControlsChanged;
-                    break;
-            }
-        }
-
-        private void OnControlsChanged(PlayerInput playerInput)
-        {
-            if (playerInput == PlayerInput)
-            {
-                UpdateGlyphs(playerInput);
-            }
-        }
-
-        private void UpdateGlyphs(PlayerInput playerInput)
-        {
-            if (!playerInput.isActiveAndEnabled)
-            {
-                return;
-            }
-
-            var devices = playerInput.devices;
-            if (devices.Count == 0)
-            {
-                Debug.LogWarning("No devices are connected.", this);
-                return;
-            }
-
-            if (InputLayoutPathUtility.TryGetActionBindingPath(InputActionReference?.action, PlayerInput.currentControlScheme, _pathBuffer))
+            if (InputLayoutPathUtility.TryGetActionBindingPath(inputActionReferenceField?.action, controlScheme, _pathBuffer))
             {
                 if (DisplayGlyphTextureGenerator.GenerateGlyphTexture(_texture, devices, _pathBuffer, GlyphsLayoutData))
                 {
-                    Destroy(Image.sprite);
                     Image.sprite = Sprite.Create(_texture, new Rect(0, 0, _texture.width, _texture.height), new Vector2(0.5f, 0.5f), Mathf.Min(_texture.width, _texture.height));
                 }
             }
@@ -184,17 +111,17 @@ namespace InputGlyphs.Display
         [SerializeField]
         public float LayoutElementSize = 100f;
 
-        public virtual int layoutPriority => EnableLayoutElement ? LayoutElementPriority : -1;
+        public int layoutPriority => EnableLayoutElement ? LayoutElementPriority : -1;
 
-        public virtual void CalculateLayoutInputHorizontal() { }
+        public void CalculateLayoutInputHorizontal() { }
 
-        public virtual void CalculateLayoutInputVertical() { }
+        public void CalculateLayoutInputVertical() { }
 
-        public virtual float minWidth => -1;
+        public float minWidth => -1;
 
-        public virtual float minHeight => -1;
+        public float minHeight => -1;
 
-        public virtual float preferredWidth
+        public float preferredWidth
         {
             get
             {
@@ -208,13 +135,13 @@ namespace InputGlyphs.Display
             }
         }
 
-        public virtual float preferredHeight => LayoutElementSize;
+        public float preferredHeight => LayoutElementSize;
 
-        public virtual float flexibleWidth => -1;
+        public float flexibleWidth => -1;
 
-        public virtual float flexibleHeight => -1;
+        public float flexibleHeight => -1;
 
-        protected void SetDirty()
+        private void SetDirty()
         {
             if (!IsActive())
                 return;
