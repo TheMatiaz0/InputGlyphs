@@ -1,5 +1,5 @@
 # Fork Notes
-This fork is port of InputGlyphs asset made by [@eviltwo](https://github.com/eviltwo/InputGlyphs) to Facepunch.Steamworks for simpler Steamworks integration and more consistent with C# naming convention.
+This fork is port of InputGlyphs asset made by [@eviltwo](https://github.com/eviltwo/InputGlyphs) to Facepunch.Steamworks for simpler Steamworks integration and more consistent with C# naming convention. Based on InputGlyphs 1.2.4.
 
 New Features:
 - Code has been refactored into more decoupled event-driven update system.
