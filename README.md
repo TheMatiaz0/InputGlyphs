@@ -1,3 +1,13 @@
+# Fork Notes
+This fork is port of InputGlyphs asset made by [@eviltwo](https://github.com/eviltwo/InputGlyphs) to Facepunch.Steamworks for simpler Steamworks integration and more consistent with C# naming convention.
+
+New Features:
+- Code has been refactored into more decoupled event-driven update system.
+- SendMessages and BroadcastMessages are now supported for PlayerInput component.
+- Made port from [Steamworks.NET](https://github.com/rlabrecque/Steamworks.NET) to my fork of [Facepunch.Steamworks](https://github.com/TheMatiaz0/Facepunch.Steamworks).
+
+Important Note: Facepunch.Steamworks is rarely updated compared to Steamworks.NET. If you want absolute latest version of Steamworks, please use eviltwo's implementation. You can also post issue within my fork and I will try to patch it up!
+
 # Input Glyphs
 InputGlyphs is a package designed to display button glyph images (icons) of input devices detected by Unity's InputSystem. It is easy to install and designed to allow for the extension of devices and glyph images.
 
