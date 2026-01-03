@@ -8,6 +8,8 @@ New Features:
 
 Important Note: Facepunch.Steamworks is rarely updated compared to Steamworks.NET. If you want absolute latest version of Steamworks, please use eviltwo's implementation. You can also post issue within my fork and I will try to patch it up!
 
+Along with these changes, there is also a new fork for eviltwo's SteamInputAdapter with Facepunch.Steamworks port: https://github.com/TheMatiaz0/UnitySteamInputAdapter
+
 # Input Glyphs
 InputGlyphs is a package designed to display button glyph images (icons) of input devices detected by Unity's InputSystem. It is easy to install and designed to allow for the extension of devices and glyph images.
 
