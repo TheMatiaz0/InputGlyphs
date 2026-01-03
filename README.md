@@ -19,12 +19,12 @@ The package includes pre-configured glyph images for keyboards & mice and variou
 
 ![Duo player glyphs](https://eviltwo.github.io/InputGlyphs_Docs/assets/duo_glyphs.png)
 
-# Purchase from Asset Store
+# Purchase eviltwo implementation from Asset Store
 https://assetstore.unity.com/packages/slug/289760
 
-# Install with UPM
+# Install Facepunch.Steamworks implementation with UPM
 ```
-https://github.com/eviltwo/InputGlyphs.git?path=InputGlyphs/Assets/InputGlyphs
+https://github.com/TheMatiaz0/InputGlyphs.git?path=InputGlyphs/Assets/InputGlyphs
 ```
 To retrieve a specific version, append `#1.0.0` at the end.
 
@@ -33,7 +33,7 @@ https://eviltwo.github.io/InputGlyphs_Docs/
 
 For information on the licenses of the assets used by this package, please refer to [Third-Party Notices.txt](InputGlyphs/Assets/InputGlyphs/Third-Party%20Notices.txt).
 
-# Support My Work
+# Support Work of eviltwo
 As a solo developer, your financial support would be greatly appreciated and helps me continue working on this project.
 - [Asset Store](https://assetstore.unity.com/publishers/12117)
 - [Steam](https://store.steampowered.com/curator/45066588)
