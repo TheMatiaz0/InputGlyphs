@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TextureDetails:
   - InputLayoutLocalPath: buttonEast
-    GlyphTexture: {fileID: 2800000, guid: a9a5ade8fae8b9e46b9a58affd25ca4c, type: 3}
+    GlyphTexture: {fileID: 2800000, guid: 951a9b0f330e8344c95fe9b7f9f408bd, type: 3}
   - InputLayoutLocalPath: buttonNorth
-    GlyphTexture: {fileID: 2800000, guid: 948b3273efe6c9e4e84a3eb65addd365, type: 3}
+    GlyphTexture: {fileID: 2800000, guid: 936b39936a212cd48906dfa2dc4252ad, type: 3}
   - InputLayoutLocalPath: buttonSouth
-    GlyphTexture: {fileID: 2800000, guid: 7d182b18bcce934419174d810b58a610, type: 3}
+    GlyphTexture: {fileID: 2800000, guid: be27d8361b7b0f041944d00a8da7edb2, type: 3}
   - InputLayoutLocalPath: buttonWest
-    GlyphTexture: {fileID: 2800000, guid: 863e390ebd46059408612c63f66c0ef4, type: 3}
+    GlyphTexture: {fileID: 2800000, guid: 018fd2398a2fa1f42a912110e7184bcd, type: 3}
   - InputLayoutLocalPath: dpad
     GlyphTexture: {fileID: 2800000, guid: 13f52a3db4466df46973225a7239c79a, type: 3}
   - InputLayoutLocalPath: dpad/up

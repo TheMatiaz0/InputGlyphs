@@ -24,12 +24,12 @@ namespace InputGlyphs.Loaders.Steam.Editor
         {
             new RequiredPackageInfo
             {
-                title = "Steamworks.NET",
-                name = "com.rlabrecque.steamworks.net",
-                pageUrl = "https://github.com/rlabrecque/Steamworks.NET",
-                packageUrl = "https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net",
-                requiredVersion = "20.2.0",
-#if SUPPORT_STEAMWORKS
+                title = "Facepunch.Steamworks",
+                name = "com.thematiaz0.facepunch.steamworks",
+                pageUrl = "https://github.com/TheMatiaz0/Facepunch.Steamworks",
+                packageUrl = "https://github.com/TheMatiaz0/Facepunch.Steamworks.git?path=UnityPlugin",
+                requiredVersion = "1.61.0",
+#if STEAMWORKS_NET
                 isInstalled = true,
 #endif
             },
